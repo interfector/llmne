@@ -187,7 +187,6 @@ struct llmne_instr
 newInstr(TokenCtx *ctx,int op,int code)
 {
 	struct llmne_instr instr;
-	int i;
 
 	instr.instr = strdup(ctx->instr);
 
@@ -280,7 +279,7 @@ InstrParse(TokenCtx* ctx)
 		else
 			offset = 0;
 
-		return newInstr(ctx,34,atoi(ctx->args[0]));
+		return newInstr(ctx,34,offset);
 	} else if (!strcmp(ctx->instr,"INC")) {
 		return newInstr(ctx,35,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DEC")) {

@@ -111,10 +111,16 @@ main(int argc,char **argv)
 				if((sym = searchSymbols(llmne.instr[i-1].ctx.args[0])))
 				{
 					if(sym->offset != llmne.instr[i-1].code)
+					{
 						printf("%d  %s %s+%d\n",llmne.instr[i-1].opcode,
 										    llmne.instr[i-1].instr,
 										    llmne.instr[i-1].ctx.args[0],
 										    llmne.instr[i-1].code - sym->offset);
+					} else {
+						printf("%d  %s %s\n",llmne.instr[i-1].opcode,
+										 llmne.instr[i-1].instr,
+										 llmne.instr[i-1].ctx.args[0]);
+					}
 				} else {
 					printf("%d  %s %s\n",llmne.instr[i-1].opcode,
 									 llmne.instr[i-1].instr,
