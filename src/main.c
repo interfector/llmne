@@ -1,3 +1,22 @@
+/*
+* LLMNE, last lol mnemonic
+* Copyright (C) 2010 nex
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include <llmne.h>
 #include <util.h>
 #include <sys/stat.h>
@@ -14,6 +33,7 @@ main(int argc,char **argv)
 	char* line = NULL;
 
 	TokenCtx tokens;
+	struct llmne_sym * sym;
 
 	init_signal();
 
@@ -63,6 +83,10 @@ main(int argc,char **argv)
 
 	line = xmalloc(256);
 
+	i = 0;
+
+	llmne.instr = xmalloc(sizeof(struct llmne_instr));
+
 	while(fgets(line,256,i_stream))
 	{
 		nline++;
@@ -77,11 +101,39 @@ main(int argc,char **argv)
 
 		TokenParse(&tokens,line);
 
-		InstrParse(&tokens);
+		llmne.instr = realloc(llmne.instr,++i * sizeof(struct llmne_instr));
+		llmne.instr[i-1] = InstrParse(&tokens);
+
+		if(llmne.instr[i-1].instr)
+		{
+			if(llmne.instr[i-1].instr_code == 27)
+			{
+				if((sym = searchSymbols(llmne.instr[i-1].ctx.args[0])))
+				{
+					if(sym->offset != llmne.instr[i-1].code)
+						printf("%d  %s %s+%d\n",llmne.instr[i-1].opcode,
+										    llmne.instr[i-1].instr,
+										    llmne.instr[i-1].ctx.args[0],
+										    llmne.instr[i-1].code - sym->offset);
+				} else {
+					printf("%d  %s %s\n",llmne.instr[i-1].opcode,
+									 llmne.instr[i-1].instr,
+									 llmne.instr[i-1].ctx.args[0]);
+				}
+			} else {
+			printf("%d  %s %s,%s\n",llmne.instr[i-1].opcode,
+							    llmne.instr[i-1].instr,
+							    llmne.instr[i-1].ctx.args[0],
+							    llmne.instr[i-1].ctx.args[1]);
+			}
+		}
 
 		free(tokens.args);
 		free(tokens.instr);
 	}
+
+	free(llmne.symbols);
+	free(llmne.instr);
 
 	if(o_stream != stdout)
 		fclose(o_stream);

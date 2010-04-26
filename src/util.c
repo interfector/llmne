@@ -155,7 +155,7 @@ resolveSymbols(int* len)
 
 				syms[i].name = strdup(line);
 				//if(!i)
-					syms[i++].offset = 0;
+					syms[i++].offset = /*0*/offs;
 				//else
 				//	syms[i++].offset = syms[i-1].offset + getInstrFromSymbol(syms[i-1].name,syms[i].name);
 			}
@@ -184,20 +184,17 @@ searchSymbols(char* name)
 }
 
 struct llmne_instr
-newInstr(char* name,char** args,int op,int code)
+newInstr(TokenCtx *ctx,int op,int code)
 {
 	struct llmne_instr instr;
 	int i;
-/*
-	instr.instr = strdup(ctx->name);
-	instr.args = malloc(ctx->argc);
 
-	for(i = 0;i < ctx->argc;i++)
-		instr.args[i] = strdup(ctx->args[i]);
+	instr.instr = strdup(ctx->instr);
 
-	instr.argc = ctx->argc;
-*/
+	memcpy(&instr.ctx,ctx,sizeof(TokenCtx));
+	
 	instr.instr_code = op;
+	instr.code = code;
 	instr.opcode = op * 100 + code;
 
 	return instr;
@@ -213,73 +210,39 @@ InstrParse(TokenCtx* ctx)
 	char* ptr;
 
 	if(!strcmp(ctx->instr,"READ")) {
-		printf("10%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,10,atoi(ctx->args[0]));
+		return newInstr(ctx,10,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"WRITE")) {
-		printf("11%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,11,atoi(ctx->args[0]));
+		return newInstr(ctx,11,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"POP")) {
-		printf("12%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,12,atoi(ctx->args[0]));
+		return newInstr(ctx,12,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"PUSH")) {
-		printf("13%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,14,atoi(ctx->args[0]));
+		return newInstr(ctx,14,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"ADD")) {
-		printf("14%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,15,atoi(ctx->args[0]));
+		return newInstr(ctx,15,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"SUB")) {
-		printf("15%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,16,atoi(ctx->args[0]));
+		return newInstr(ctx,16,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"MUL")) {
-		printf("16%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,17,atoi(ctx->args[0]));
+		return newInstr(ctx,17,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DIV")) {
-		printf("17%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,18,atoi(ctx->args[0]));
+		return newInstr(ctx,18,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"MOD")) {
-		printf("18%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,19,atoi(ctx->args[0]));
+		return newInstr(ctx,19,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"AND")) {
-		printf("19%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,20,atoi(ctx->args[0]));
+		return newInstr(ctx,20,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"OR")) {
-		printf("20%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,21,atoi(ctx->args[0]));
+		return newInstr(ctx,21,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"XOR")) {
-		printf("21%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,22,atoi(ctx->args[0]));
+		return newInstr(ctx,22,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"NOT")) {
-		printf("22%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,23,atoi(ctx->args[0]));
+		return newInstr(ctx,23,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"SHL")) {
-		printf("23%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,24,atoi(ctx->args[0]));
+		return newInstr(ctx,24,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"SHR")) {
-		printf("24%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,25,atoi(ctx->args[0]));
+		return newInstr(ctx,25,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DEL")) {
-		printf("25%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,26,atoi(ctx->args[0]));
+		return newInstr(ctx,26,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"NOP")) {
-		printf("2600\n");
-
-		return newInstr(ctx->instr,ctx->args,26,0);
+		return newInstr(ctx,26,0);
 	} else if (!strcmp(ctx->instr,"JMP")) {
 		if((ptr = strchr(ctx->args[0],'+')))
 		{
@@ -288,39 +251,21 @@ InstrParse(TokenCtx* ctx)
 		}
 
 		if(searchSymbols(ctx->args[0]))
-		{
-			printf("27%02d\n",(searchSymbols(ctx->args[0]))->offset + offset);
-
-			return newInstr(ctx->instr,ctx->args,27,(searchSymbols(ctx->args[0]))->offset + offset);
-		}
+			return newInstr(ctx,27,(searchSymbols(ctx->args[0]))->offset + offset);
 		else
-			printf("27%02d\n",atoi(ctx->args[0]));
-
-			return newInstr(ctx->instr,ctx->args,27,atoi(ctx->args[0]));
+			return newInstr(ctx,27,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"CMP")) {
-		printf("28%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,28,atoi(ctx->args[0]));
+		return newInstr(ctx,28,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"JN")) {
-		printf("29%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,29,atoi(ctx->args[0]));
+		return newInstr(ctx,29,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"JZ")) {
-		printf("30%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,30,atoi(ctx->args[0]));
+		return newInstr(ctx,30,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"JM")) {
-		printf("31%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,31,atoi(ctx->args[0]));
+		return newInstr(ctx,31,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"JG")) {
-		printf("32%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,32,atoi(ctx->args[0]));
+		return newInstr(ctx,32,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"EXIT")) {
-		printf("33%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,33,atoi(ctx->args[0]));
+		return newInstr(ctx,33,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DISPLAY")) {
 		if(!strcmp(ctx->args[0],"INT"))
 			offset = 0;
@@ -335,17 +280,12 @@ InstrParse(TokenCtx* ctx)
 		else
 			offset = 0;
 
-		printf("34%02d\n",offset);
-
-		return newInstr(ctx->instr,ctx->args,34,atoi(ctx->args[0]));
+		return newInstr(ctx,34,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"INC")) {
-		printf("35%02d\n",atoi(ctx->args[0]));
-
-		return newInstr(ctx->instr,ctx->args,35,atoi(ctx->args[0]));
+		return newInstr(ctx,35,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DEC")) {
-		printf("36%02d\n",atoi(ctx->args[0]));
+		return newInstr(ctx,36,atoi(ctx->args[0]));
+	}	
 
-		return newInstr(ctx->instr,ctx->args,36,atoi(ctx->args[0]));
-	}
-		
+	return (struct llmne_instr) { 0,{ 0 },0,0,0 };
 }

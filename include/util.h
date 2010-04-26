@@ -48,6 +48,7 @@ void  TokenParse(TokenCtx*,char*);
 struct llmne_sym* resolveSymbols(int*);
 struct llmne_sym* searchSymbols(char*);
 struct llmne_instr  InstrParse(TokenCtx*);
+struct llmne_instr  newInstr(TokenCtx*,int,int);
 
 extern int suppress_error;
 extern int nline;

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <util.h>
 
 struct llmne_sym {
 	int   offset;
@@ -30,10 +31,10 @@ struct llmne_sym {
 
 struct llmne_instr {
 	char*  instr;
-	char** args;
-	int argc;
+	TokenCtx ctx;
 
 	int instr_code;
+	int code;
 	int opcode;
 };
 
