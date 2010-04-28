@@ -30,6 +30,7 @@
 #define xdie(x) do{ perror(x); exit(1); }while(1)
 
 typedef struct {
+	char* line;
 	char* instr;
 
 	char** args;
@@ -45,10 +46,14 @@ void  init_signal(void);
 char** split(char*,char*,int*);
 void  TokenParse(TokenCtx*,char*);
 
+struct llmne_var* resolveVarSymbols(int*);
 struct llmne_sym* resolveSymbols(int*);
 struct llmne_sym* searchSymbols(char*);
 struct llmne_instr  InstrParse(TokenCtx*);
 struct llmne_instr  newInstr(TokenCtx*,int,int);
+
+void llmne_parse_all(char*);
+void printInstr();
 
 extern int suppress_error;
 extern int nline;

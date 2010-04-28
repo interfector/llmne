@@ -32,9 +32,6 @@ main(int argc,char **argv)
 	char* file = NULL;
 	char* line = NULL;
 
-	TokenCtx tokens;
-	struct llmne_sym * sym;
-
 	init_signal();
 
 	o_stream = stdout;
@@ -80,12 +77,10 @@ main(int argc,char **argv)
 	}
 
 	llmne.symbols = resolveSymbols(&llmne.syms_len);
-
+	llmne.vars = resolveVarSymbols(&llmne.vars_len);
 	line = xmalloc(256);
-
-	i = 0;
-
 	llmne.instr = xmalloc(sizeof(struct llmne_instr));
+	llmne.instr_len = i = 0;
 
 	while(fgets(line,256,i_stream))
 	{
@@ -99,45 +94,9 @@ main(int argc,char **argv)
 		if(line[0] == '#' || line[0] == '\0')
 			continue;
 
-		TokenParse(&tokens,line);
-
-		llmne.instr = realloc(llmne.instr,++i * sizeof(struct llmne_instr));
-		llmne.instr[i-1] = InstrParse(&tokens);
-
-		if(llmne.instr[i-1].instr)
-		{
-			if(llmne.instr[i-1].instr_code == 27)
-			{
-				if((sym = searchSymbols(llmne.instr[i-1].ctx.args[0])))
-				{
-					if(sym->offset != llmne.instr[i-1].code)
-					{
-						printf("%d  %s %s+%d\n",llmne.instr[i-1].opcode,
-										    llmne.instr[i-1].instr,
-										    llmne.instr[i-1].ctx.args[0],
-										    llmne.instr[i-1].code - sym->offset);
-					} else {
-						printf("%d  %s %s\n",llmne.instr[i-1].opcode,
-										 llmne.instr[i-1].instr,
-										 llmne.instr[i-1].ctx.args[0]);
-					}
-				} else {
-					printf("%d  %s %s\n",llmne.instr[i-1].opcode,
-									 llmne.instr[i-1].instr,
-									 llmne.instr[i-1].ctx.args[0]);
-				}
-			} else {
-			printf("%d  %s %s,%s\n",llmne.instr[i-1].opcode,
-							    llmne.instr[i-1].instr,
-							    llmne.instr[i-1].ctx.args[0],
-							    llmne.instr[i-1].ctx.args[1]);
-			}
-		}
-
-		free(tokens.args);
-		free(tokens.instr);
+		llmne_parse_all(line);
 	}
-
+	
 	free(llmne.symbols);
 	free(llmne.instr);
 

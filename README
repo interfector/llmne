@@ -6,3 +6,6 @@ instruction that are converted in pseudo-opcodes for the program LXS.
 It's funny!
 
 JFF(JustForFun!!!11!ONE!1)
+
+VAR == offset
+(VAR) == value

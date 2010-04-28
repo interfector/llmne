@@ -1,0 +1,9 @@
+#!/usr/local/bin/llmne
+
+SET I,0
+SET LOL,1
+
+WRITE I
+WRITE (I)
+WRITE LOL
+WRITE (LOL)

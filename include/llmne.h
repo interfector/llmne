@@ -38,6 +38,12 @@ struct llmne_instr {
 	int opcode;
 };
 
+struct llmne_var {
+	int value;
+	int offset;
+	char* name;
+};
+
 struct llmne_file {
 	int lenght;
 
@@ -46,6 +52,9 @@ struct llmne_file {
 
 	struct llmne_sym * symbols;
 	int syms_len;
+
+	struct llmne_var * vars;
+	int vars_len;
 };
 
 static const struct option long_options[] =
@@ -60,7 +69,7 @@ FILE* o_stream;
 FILE* i_stream;
 
 #define USAGE "Usage: %s [-n] [-o <file>] [-v] [-h] input_file\n" \
-		    "\t-n|--suppress\tDo not exit finding an error.\n" \
+		    "\t-s|--suppress\tDo not exit when find errors.(dangerous)\n" \
 		    "\t-o|--output\tSet the output file.\n"  \
 		    "\t-v|--version\tShow the program version.\n" \
 		    "\t-h|--help\tShow this help.\n"
