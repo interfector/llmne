@@ -82,6 +82,11 @@ main(int argc,char **argv)
 	llmne.instr = xmalloc(sizeof(struct llmne_instr));
 	llmne.instr_len = i = 0;
 
+	llmne.ax.name = xmalloc(2);
+	strcpy(llmne.ax.name,"AX");
+	llmne.ax.value = 0;
+	llmne.ax.offset = -1;
+
 	while(fgets(line,256,i_stream))
 	{
 		nline++;
@@ -96,6 +101,14 @@ main(int argc,char **argv)
 
 		llmne_parse_all(line);
 	}
+
+	printf("\nInstr no. :%d\n",llmne.instr_len);
+
+#ifdef _DEBUG
+	dump_vars();
+
+	dump_symbols();
+#endif
 	
 	free(llmne.symbols);
 	free(llmne.instr);

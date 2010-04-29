@@ -128,6 +128,7 @@ TokenParse(TokenCtx *ctx,char* line)
 		if(strcmp(ctx->instr,"EXIT") && 
 	        strcmp(ctx->instr,"NOP") && 
 		   strcmp(ctx->instr,"SET") && 
+		   strcmp(ctx->instr,"RET") && 
 		   ctx->instr[strlen(ctx->instr)-1] != ':') 
 			die("* Syntax error, too few operands after instruction at line: %d.\n",nline);
 }
@@ -280,6 +281,42 @@ resolveVarSymbols(int* len)
 	return vars;
 }
 
+struct llmne_var*
+CreateTempVar(int val,char* name)
+{
+	int i = 0,pos;
+	char* line = xmalloc(256);
+	TokenCtx ctx;
+	struct llmne_var * var = xmalloc(sizeof(struct llmne_var));
+
+	fgetpos(i_stream,(fpos_t*)&pos);
+
+	fseek(i_stream,0,SEEK_SET);
+	
+	while(fgets(line,256,i_stream))
+	{
+		line[strlen(line)-1] = '\0';
+		if(!line || line[0] == '#' || line[0] == '\0')
+			continue;
+		TokenParse(&ctx,line);
+		i++;
+	}
+
+	var->offset = i;
+	var->name = strdup(name);
+	var->value = val;
+
+	llmne.vars = realloc(llmne.vars,++llmne.vars_len * sizeof(struct llmne_var));
+
+	llmne.vars[llmne.vars_len-1] = *var;
+
+	fseek(i_stream,pos,SEEK_CUR);
+
+	free(line);
+
+	return var;
+}
+
 struct llmne_sym*
 searchSymbols(char* name)
 {
@@ -296,6 +333,9 @@ struct llmne_var*
 searchVar(char* name)
 {
 	int i;
+	
+	if(!strcmp(name,"AX"))
+		return &llmne.ax;
 
 	for(i = 0;i < llmne.vars_len;i++)
 		if(!strcmp(llmne.vars[i].name,name))
@@ -335,8 +375,37 @@ InstrParse(TokenCtx* ctx)
 
 	int offset = 0;
 	char* ptr = NULL;
+	struct llmne_var * var;
+//	struct llmne_var * tmp = CreateTempVar(0);
 
 	if(!strcmp(ctx->instr,"READ")) {
+		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
+		{
+			ptr = xmalloc(strlen(ctx->args[0]) - 1);
+
+			strcpy(ptr,ctx->args[0] + 1);
+			ptr[strlen(ptr)-1] = '\0';
+
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,10,var->value);
+			else if (!strcmp(ptr,"AX"))
+			{
+				printf("AX found.\n");
+
+				struct llmne_var * read_var;
+				if(searchVar("READVAR"))
+					read_var = searchVar("READVAR");
+				else
+					read_var = CreateTempVar(0,"READVAR");
+
+				AddInstrTo(ctx,10,read_var->offset);
+				return newInstr(ctx,13,read_var->offset);
+			}
+		}
+
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,10,var->offset);
+
 		return newInstr(ctx,10,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"WRITE")) {
 		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
@@ -346,42 +415,129 @@ InstrParse(TokenCtx* ctx)
 			strcpy(ptr,ctx->args[0] + 1);
 			ptr[strlen(ptr)-1] = '\0';
 
-			if(searchVar(ptr))
-				return newInstr(ctx,11,(searchVar(ptr))->value);
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,11,var->value);
+			else if(!strcmp(ptr,"AX"))
+			{
+//				AddInstrTo(ctx,12,tmp->offset);
+//				return newInstr(ctx,11,tmp->offset);
+			}
 		}
 
-		if(searchVar(ctx->args[0]))
-			return newInstr(ctx,11,(searchVar(ctx->args[0]))->offset);
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,11,var->offset);
 
 		return newInstr(ctx,11,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"POP")) {
+		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
+		{
+			ptr = xmalloc(strlen(ctx->args[0]) - 1);
+
+			strcpy(ptr,ctx->args[0] + 1);
+			ptr[strlen(ptr)-1] = '\0';
+
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,12,var->value);
+		}
+
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,12,var->offset);
+
 		return newInstr(ctx,12,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"PUSH")) {
-		return newInstr(ctx,14,atoi(ctx->args[0]));
+		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
+		{
+			ptr = xmalloc(strlen(ctx->args[0]) - 1);
+
+			strcpy(ptr,ctx->args[0] + 1);
+			ptr[strlen(ptr)-1] = '\0';
+
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,13,var->value);
+		}
+
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,13,var->offset);
+
+		return newInstr(ctx,13,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"ADD")) {
-		return newInstr(ctx,15,atoi(ctx->args[0]));
+		if((var = searchVar(ctx->args[0])))
+		{
+			if(ctx->args[1][0] == '(' && ctx->args[1][strlen(ctx->args[1])-1] == ')')
+			{
+				ptr = xmalloc(strlen(ctx->args[1]) - 1);
+				strcpy(ptr,ctx->args[1] + 1);
+				ptr[strlen(ptr)-1] = '\0';
+	
+				if(searchVar(ptr))
+				{
+					AddInstrTo(ctx,13,var->offset);
+					AddInstrTo(ctx,14,(searchVar(ptr))->offset);
+
+					return newInstr(ctx,12,var->offset);
+				} else if(!strcmp(ptr,"AX"))
+				{
+					AddInstrTo(ctx,14,var->offset);
+					return newInstr(ctx,12,var->offset);
+				}
+			} else { 
+				struct llmne_var * pushed;
+
+				if(searchVar("ADDVAR"))
+					pushed = searchVar("ADDVAR");
+				else
+					pushed = CreateTempVar(atoi(ctx->args[1]),"ADDVAR");
+
+				AddInstrTo(ctx,13,var->offset);
+				AddInstrTo(ctx,14,pushed->offset);
+
+				return newInstr(ctx,12,var->offset);
+			}
+		} else if(!strcmp(ctx->args[0],"AX"))
+		{
+			if(ctx->args[1][0] == '(' && ctx->args[1][strlen(ctx->args[1])-1] == ')')
+			{
+				ptr = xmalloc(strlen(ctx->args[1]) - 1);
+				strcpy(ptr,ctx->args[1] + 1);
+				ptr[strlen(ptr)-1] = '\0';
+
+				if((var = searchVar(ptr)))
+					return newInstr(ctx,14,var->offset);
+			} else {
+				struct llmne_var * addtoax;
+				
+				if(searchVar("ADDTOAX"))
+					addtoax = searchVar("ADDTOAX");
+				else
+					addtoax = CreateTempVar(atoi(ctx->args[1]),"ADDTOAX");
+
+				return newInstr(ctx,14,addtoax->offset);
+			}
+		}
+
+		return newInstr(ctx,10,atoi(ctx->args[0])); 
 	} else if (!strcmp(ctx->instr,"SUB")) {
-		return newInstr(ctx,16,atoi(ctx->args[0]));
+		return newInstr(ctx,15,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"MUL")) {
-		return newInstr(ctx,17,atoi(ctx->args[0]));
+		return newInstr(ctx,16,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DIV")) {
-		return newInstr(ctx,18,atoi(ctx->args[0]));
+		return newInstr(ctx,17,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"MOD")) {
-		return newInstr(ctx,19,atoi(ctx->args[0]));
+		return newInstr(ctx,18,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"AND")) {
-		return newInstr(ctx,20,atoi(ctx->args[0]));
+		return newInstr(ctx,19,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"OR")) {
-		return newInstr(ctx,21,atoi(ctx->args[0]));
+		return newInstr(ctx,20,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"XOR")) {
-		return newInstr(ctx,22,atoi(ctx->args[0]));
+		return newInstr(ctx,21,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"NOT")) {
-		return newInstr(ctx,23,atoi(ctx->args[0]));
+		return newInstr(ctx,22,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"SHL")) {
-		return newInstr(ctx,24,atoi(ctx->args[0]));
+		return newInstr(ctx,23,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"SHR")) {
-		return newInstr(ctx,25,atoi(ctx->args[0]));
+		return newInstr(ctx,24,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DEL")) {
-		return newInstr(ctx,26,atoi(ctx->args[0]));
+		return newInstr(ctx,25,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"NOP")) {
 		return newInstr(ctx,26,0);
 	} else if (!strcmp(ctx->instr,"JMP")) {
@@ -426,7 +582,52 @@ InstrParse(TokenCtx* ctx)
 		return newInstr(ctx,35,atoi(ctx->args[0]));
 	} else if (!strcmp(ctx->instr,"DEC")) {
 		return newInstr(ctx,36,atoi(ctx->args[0]));
-	}	
+	} else if (!strcmp(ctx->instr,"CALL")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,37,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,37,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"RET")) {
+		return newInstr(ctx,38,0);
+	} else if (!strcmp(ctx->instr,"STPUSH")) {
+		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
+		{
+			ptr = xmalloc(strlen(ctx->args[0]) - 1);
+
+			strcpy(ptr,ctx->args[0] + 1);
+			ptr[strlen(ptr)-1] = '\0';
+
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,39,var->value);
+		}
+
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,39,var->offset);
+
+		return newInstr(ctx,39,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"STPOP")) {
+		if(ctx->args[0][0] == '(' && ctx->args[0][strlen(ctx->args[0])-1] == ')')
+		{
+			ptr = xmalloc(strlen(ctx->args[0]) - 1);
+
+			strcpy(ptr,ctx->args[0] + 1);
+			ptr[strlen(ptr)-1] = '\0';
+
+			if((var = searchVar(ptr)))
+				return newInstr(ctx,40,var->value);
+		}
+
+		if((var = searchVar(ctx->args[0])))
+			return newInstr(ctx,40,var->offset);
+
+		return newInstr(ctx,40,atoi(ctx->args[0]));
+	}
 
 	return (struct llmne_instr) { 0,{ 0 },0,0,0 };
 }
@@ -471,13 +672,35 @@ printInstr()
 }
 
 void
+dump_vars()
+{
+	int i;
+
+	printf("\nVariables:\n");
+
+	for(i = 0;i < llmne.vars_len;i++)
+		printf("name: %s\tvalue: %d\n",llmne.vars[i].name,llmne.vars[i].value);
+}
+
+void
+dump_symbols()
+{
+	int i;
+
+	printf("\nSymbols:\n");
+
+	for(i = 0;i < llmne.syms_len;i++)
+		printf("name: %s\toffset: %d\n",llmne.symbols[i].name,llmne.symbols[i].offset);
+}
+
+void
 llmne_parse_all(char* line)
 {
 	TokenCtx tokens;
 	
 	TokenParse(&tokens,line);
 
-	if(tokens.instr[strlen(tokens.instr)-1] != ':') {
+	if(tokens.instr[strlen(tokens.instr)-1] != ':' && strcmp(tokens.instr,"SET")) {
 		llmne.instr = realloc(llmne.instr,++llmne.instr_len * sizeof(struct llmne_instr));
 		llmne.instr[llmne.instr_len-1] = InstrParse(&tokens);
 

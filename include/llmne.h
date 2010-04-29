@@ -55,6 +55,8 @@ struct llmne_file {
 
 	struct llmne_var * vars;
 	int vars_len;
+
+	struct llmne_var ax;
 };
 
 static const struct option long_options[] =
@@ -67,6 +69,8 @@ static const struct option long_options[] =
 
 FILE* o_stream;
 FILE* i_stream;
+
+//#define _DEBUG
 
 #define USAGE "Usage: %s [-n] [-o <file>] [-v] [-h] input_file\n" \
 		    "\t-s|--suppress\tDo not exit when find errors.(dangerous)\n" \
