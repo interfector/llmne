@@ -41,19 +41,19 @@ void  handle(int,siginfo_t*,void*);
 void* xmalloc(int);
 void  die(char*,...);
 void  banner(void);
-char* trim(char*);
 void  init_signal(void);
-char** split(char*,char*,int*);
 void  TokenParse(TokenCtx*,char*);
 
-struct llmne_var* resolveVarSymbols(int*);
-struct llmne_sym* resolveSymbols(int*);
-struct llmne_sym* searchSymbols(char*);
+struct llmne_sym*   searchSymbols(char*);
 struct llmne_instr  InstrParse(TokenCtx*);
 struct llmne_instr  newInstr(TokenCtx*,int,int);
 
+void handle_symbol(char*,int);
+void resolveSymbols(void);
+
 void llmne_parse_all(char*);
 void printInstr();
+void lxs_execute();
 
 extern int suppress_error;
 extern int nline;

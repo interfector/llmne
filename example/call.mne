@@ -1,0 +1,14 @@
+#!/usr/local/bin/llmne -x
+I:
+0001
+
+WRITE I
+CALL	WRTJ
+EXIT 0
+
+WRTJ:
+WRITE J
+RET
+
+J:
+0005

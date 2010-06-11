@@ -1,0 +1,21 @@
+#!/usr/local/bin/llmne -x
+# stpush,stpop example
+
+ONE:
+0001
+
+TWO:
+0002
+
+THREE:
+0000
+
+FOUR:
+0000
+
+STPUSH ONE
+STPUSH TWO
+STPOP  THREE
+WRITE  THREE
+STPOP  FOUR
+WRITE  FOUR

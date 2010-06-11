@@ -1,0 +1,18 @@
+#!/usr/local/bin/llmne -x
+
+ONE:
+
+INC _START
+INC ONIZE
+WRITE ONIZE
+PUSH ONIZE
+CMP TERM
+JN ONIZE
+
+END:
+EXIT 0
+
+TERM:
+3600
+
+_START:

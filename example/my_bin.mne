@@ -1,0 +1,36 @@
+#!/usr/local/bin/llmne -x
+
+READ I
+
+LOOP:
+PUSH I
+CMP K
+JZ END
+MOD J
+CMP K
+JZ WRT
+WRITE Z
+JMP LOOP+9
+
+WRT:
+WRITE K
+PUSH I
+DIV J
+POP I
+JMP LOOP
+
+END:
+EXIT 00
+
+# VAR
+I:
+0000
+
+J:
+0002
+
+K:
+0000
+
+Z:
+0001

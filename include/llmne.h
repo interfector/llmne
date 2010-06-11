@@ -38,25 +38,12 @@ struct llmne_instr {
 	int opcode;
 };
 
-struct llmne_var {
-	int value;
-	int offset;
-	char* name;
-};
-
 struct llmne_file {
-	int lenght;
-
 	struct llmne_instr * instr;
 	int instr_len;
 
 	struct llmne_sym * symbols;
 	int syms_len;
-
-	struct llmne_var * vars;
-	int vars_len;
-
-	struct llmne_var ax;
 };
 
 static const struct option long_options[] =
@@ -64,23 +51,25 @@ static const struct option long_options[] =
 	{"suppress", no_argument, 0, 's' },
 	{"output", required_argument, 0, 'o'},
 	{"version", no_argument, 0, 'v'},
+	{"execute", no_argument, 0, 'x' },
 	{"help", no_argument, 0, 'h'}
 };
 
 FILE* o_stream;
 FILE* i_stream;
 
-//#define _DEBUG
-
 #define USAGE "Usage: %s [-n] [-o <file>] [-v] [-h] input_file\n" \
 		    "\t-s|--suppress\tDo not exit when find errors.(dangerous)\n" \
 		    "\t-o|--output\tSet the output file.\n"  \
 		    "\t-v|--version\tShow the program version.\n" \
+		    "\t-x|--execute\tExecute the file via lxs.\n" \
 		    "\t-h|--help\tShow this help.\n"
 
-#define VPRINT "llmne-"VERSION" Copyright(C) 2010 by nex\n" \
-				"Released under the GPL v3.0 license.\n" \
-			"This is free software: you are free to change and redistribute it.\n" \
-			"There is NO WARRANTY, to the extent permitted by law.\n"
+#define VPRINT "llmne-"VERSION" Copyright (C) 2010 nex \n" \
+		  "This program comes with ABSOLUTELY NO WARRANTY.\n" \
+		  "This is free software, and you are welcome to redistribute it\n" \
+	       "under certain conditions.\n"
+
+//#define _DEBUG
 
 #endif

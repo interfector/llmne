@@ -1,0 +1,29 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+# nop sled
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+
+INIT:
+
+DEL _START
+INC INIT
+#WRITE INIT
+#PUSH INIT
+#CMP TERM
+#JZ END
+JMP INIT
+
+#JMP INIT
+
+END:
+EXIT 0
+
+TERM:
+1000

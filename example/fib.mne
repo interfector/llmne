@@ -1,0 +1,22 @@
+#!/usr/local/bin/llmne -x
+# Fibonacci sequence
+
+X:
+0001
+
+Y:
+0001
+
+Z:
+0000
+
+LOOP:
+WRITE X
+PUSH X
+POP Z
+PUSH X
+ADD Y
+POP X
+PUSH Z
+POP Y
+JMP LOOP

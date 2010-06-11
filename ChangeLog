@@ -1,5 +1,9 @@
 2010-04-25 nex <nex@autistici.org>
 
+* util.c: fixed some bug in symbol reference, but i kept something wrong
+
+* util.c: bugs in symbol reference
+
 * util.c: the main program is here :D
 
 * main.c: interface

@@ -31,12 +31,13 @@ main(int argc,char **argv)
 	int i;
 	char* file = NULL;
 	char* line = NULL;
+	int   execute = 0;
 
 	init_signal();
 
 	o_stream = stdout;
 	
-	while((i = getopt_long(argc, argv, "svho:", long_options, NULL)) > 0)
+	while((i = getopt_long(argc, argv, "svho:x", long_options, NULL)) > 0)
 	{
 		switch(i)
 		{
@@ -47,6 +48,9 @@ main(int argc,char **argv)
 				die(VPRINT);
 			case 'o':
 				file = strdup(optarg);
+				break;
+			case 'x':
+				execute = 1;
 				break;
 			case '?':
 			case 'h':
@@ -76,20 +80,17 @@ main(int argc,char **argv)
 			xdie("dup");
 	}
 
-	llmne.symbols = resolveSymbols(&llmne.syms_len);
-	llmne.vars = resolveVarSymbols(&llmne.vars_len);
+	llmne.symbols = malloc(sizeof(struct llmne_sym));
+	llmne.syms_len = 0;
+
+	resolveSymbols();
+
 	line = xmalloc(256);
 	llmne.instr = xmalloc(sizeof(struct llmne_instr));
 	llmne.instr_len = i = 0;
 
-	llmne.ax.name = xmalloc(2);
-	strcpy(llmne.ax.name,"AX");
-	llmne.ax.value = 0;
-	llmne.ax.offset = -1;
-
 	while(fgets(line,256,i_stream))
 	{
-		nline++;
 		line[strlen(line)-1] = '\0';
 
 #ifdef _DEBUG
@@ -102,16 +103,19 @@ main(int argc,char **argv)
 		llmne_parse_all(line);
 	}
 
-	printf("\nInstr no. :%d\n",llmne.instr_len);
-
 #ifdef _DEBUG
-	dump_vars();
-
 	dump_symbols();
 #endif
+
+	printInstr();
+
+	if(execute)
+		lxs_execute();
 	
 	free(llmne.symbols);
 	free(llmne.instr);
+	free(line);
+	free(file);
 
 	if(o_stream != stdout)
 		fclose(o_stream);
