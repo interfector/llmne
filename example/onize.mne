@@ -1,10 +1,10 @@
 #!/usr/local/bin/llmne -x
+# dummy program
 
 ONE:
 
 INC _START
 INC ONIZE
-WRITE ONIZE
 PUSH ONIZE
 CMP TERM
 JN ONIZE

@@ -54,6 +54,7 @@ void resolveSymbols(void);
 void llmne_parse_all(char*);
 void printInstr();
 void lxs_execute();
+void dump_symbols();
 
 extern int suppress_error;
 extern int nline;

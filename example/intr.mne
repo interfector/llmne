@@ -1,4 +1,5 @@
 #!/usr/local/bin/llmne -x
+# a fuggy interpreter written in llmne
 
 READER:
 

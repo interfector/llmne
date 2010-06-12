@@ -1,16 +1,17 @@
 #!/usr/local/bin/llmne -x
+# display hello
+
 DISPLAY CHAR
 
 LOOP:
 
 PUSH HELLO
 CMP NULL
-JZ LOOP+12
+JZ LOOP+7
 INC LOOP
 WRITE HELLO
 INC LOOP+4
-CMP TERM
-JN  LOOP
+JMP LOOP
 EXIT 0
 
 NULL:

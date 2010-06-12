@@ -94,7 +94,7 @@ main(int argc,char **argv)
 		line[strlen(line)-1] = '\0';
 
 #ifdef _DEBUG
-		printf("%d:%s\n",nline,line);
+		printf("[DEBUG]  %d:%s\n",nline,line);
 #endif
 
 		if(line[0] == '#' || line[0] == '\0')

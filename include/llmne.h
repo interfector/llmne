@@ -58,7 +58,7 @@ static const struct option long_options[] =
 FILE* o_stream;
 FILE* i_stream;
 
-#define USAGE "Usage: %s [-n] [-o <file>] [-v] [-h] input_file\n" \
+#define USAGE "Usage: %s [-s] [-o <file>] [-v] [-h] input_file\n" \
 		    "\t-s|--suppress\tDo not exit when find errors.(dangerous)\n" \
 		    "\t-o|--output\tSet the output file.\n"  \
 		    "\t-v|--version\tShow the program version.\n" \
@@ -69,7 +69,7 @@ FILE* i_stream;
 		  "This program comes with ABSOLUTELY NO WARRANTY.\n" \
 		  "This is free software, and you are welcome to redistribute it\n" \
 	       "under certain conditions.\n"
-
-//#define _DEBUG
-
+/*
+#define _DEBUG
+*/
 #endif

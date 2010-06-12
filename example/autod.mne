@@ -1,4 +1,5 @@
 #!/usr/local/bin/llmne -x
+# self-desctruction code, loops every instruction from 1100 to 1206
 
 _START:
 
@@ -14,13 +15,8 @@ INIT:
 
 DEL _START
 INC INIT
-#WRITE INIT
-#PUSH INIT
-#CMP TERM
-#JZ END
+WRITE INIT # Write the current instruction set
 JMP INIT
-
-#JMP INIT
 
 END:
 EXIT 0

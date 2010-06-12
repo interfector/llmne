@@ -580,10 +580,9 @@ dump_symbols()
 {
 	int i;
 
-	printf("\nSymbols:\n");
-
 	for(i = 0;i < llmne.syms_len;i++)
-		printf("name: %s\toffset: %d\n",llmne.symbols[i].name,llmne.symbols[i].offset);
+		printf("[DEBUG] |-- @ Name: %s.\n"
+			  "[DEBUG] |-> @ Offset: %02d.\n",llmne.symbols[i].name,llmne.symbols[i].offset);
 }
 
 void

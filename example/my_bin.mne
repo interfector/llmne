@@ -1,4 +1,5 @@
 #!/usr/local/bin/llmne -x
+# calculate the binary representation of an integer
 
 READ I
 
