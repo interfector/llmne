@@ -1,9 +1,0 @@
-#!/usr/local/bin/llmne
-
-
-
-READ  01
-WRITE 01
-
-READ  (AX)
-WRITE (AX)
