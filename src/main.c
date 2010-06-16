@@ -26,6 +26,18 @@ int suppress_error = 0,nline = 0;
 struct llmne_file llmne;
 
 int
+stroff(char* str,char c)
+{
+	int i;
+
+	for(i = 0;i < strlen(str);i++)
+		if(str[i] == c)
+			return i;
+
+	return -1;
+}
+
+int
 main(int argc,char **argv)
 {
 	int i;
@@ -99,6 +111,9 @@ main(int argc,char **argv)
 
 		if(line[0] == '#' || line[0] == '\0')
 			continue;
+
+		if(stroff(line,'#') != -1)
+			line[stroff(line,'#')] = '\0';
 
 		llmne_parse_all(line);
 	}

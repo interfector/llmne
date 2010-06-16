@@ -3,6 +3,9 @@
 
 DISPLAY CHAR
 
+NEWLINE:
+0010 '\n'
+
 LOOP:
 
 PUSH HELLO
@@ -29,6 +32,8 @@ INC LOOP
 JMP LOOP
 
 END:
+WRITE NEWLINE
+
 EXIT 0
 
 NULL:
@@ -38,11 +43,11 @@ ROT:
 0013
 
 N:
-0045
+0110 'n'
 
 HELLO:
-0007 H
-0036 e
-0043 l
-0043 l
-0046 o
+0104 'h'
+0101 'e'
+0108 'l'
+0108 'l'
+0111 'o'

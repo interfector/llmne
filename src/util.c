@@ -82,12 +82,13 @@ trim(char* string)
 	char* trim = malloc(strlen(string));
 	int i,k;
 
+	memset(trim,0,strlen(string));
+
 	for(i = 0,k = 0;i < strlen(string);i++)
 		if(string[i] != ' ' && 
 		   string[i] != '\r' &&
  		   string[i] != '\n' &&
-		   string[i] != '\t' &&
-		   string[i] != '\x0B')
+		   string[i] != '\t')
 		trim[k++] = string[i];
 
 	return trim;
@@ -177,10 +178,27 @@ resolveSymbols(void)
 struct llmne_sym*
 searchSymbols(char* name)
 {
-	int i;
+	int i,k;
+	char* ptr;
+
+	if(strchr(name,' ') || strchr(name,'\t'))
+	{
+		ptr = malloc(strlen(name));
+
+		memset(ptr,0,strlen(name));
+
+		for(i = 0,k = 0;i < strlen(name);i++)
+			if(name[i] != ' ' && name[i] != '\t')
+				ptr[k++] = name[i];
+	} else
+		ptr = strdup(name);
+
+#ifdef _DEBUG
+	printf("[DEBUG] Searched symbols: %s.\n",ptr);
+#endif
 
 	for(i = 0;i < llmne.syms_len;i++)
-		if(!strcmp(llmne.symbols[i].name,name))
+		if(!strcmp(llmne.symbols[i].name,ptr))
 			return &llmne.symbols[i];
 
 	return NULL;

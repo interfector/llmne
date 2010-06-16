@@ -1,6 +1,6 @@
 # LLMNE
 
-VERSION = 0.1.7
+VERSION = 0.1.8
 
 # includes and libs
 LIBS =
@@ -13,8 +13,10 @@ BIN = llmne
 
 all:
 	gcc -o $(BIN) $(SRC) $(CFLAGS)
+	make -C example all
 
 clean:
+	make -C example clean 
 	rm -f $(BIN)
 
 install: all

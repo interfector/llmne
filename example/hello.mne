@@ -4,7 +4,7 @@
 DISPLAY CHAR
 
 LOOP:
-
+# Loop until *HELLO == '\0'
 PUSH HELLO
 CMP NULL
 JZ LOOP+7
@@ -18,8 +18,15 @@ NULL:
 0000
 
 HELLO:
-0007 H
-0036 e
-0043 l
-0043 l
-0046 o
+0072 'H'
+0101 'e'
+0108 'l'
+0108 'l'
+0111 'o'
+0032 ' '
+0087 'W'
+0111 'o'
+0114 'r'
+0108 'l'
+0100 'd'
+0010 '\n'
