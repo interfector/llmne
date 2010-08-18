@@ -1,0 +1,54 @@
+#!/usr/local/bin/llmne -x
+#
+# int 
+# swap(int n)
+# {
+#	int k;
+#
+#	for(k = 0 ; n ; n /= 10)
+#		k = k * 10 + (n % 10);
+#
+#	return k;
+# }
+#			
+
+MAIN:
+PUSH N
+CMP NULL
+JZ PRINT
+
+PUSH N
+MOD TEN
+POP J
+
+PUSH K
+MUL TEN
+
+ADD J
+
+POP K
+
+PUSH N
+DIV TEN
+POP N
+
+JMP MAIN
+
+PRINT:
+WRITE K
+EXIT 0
+
+NULL:
+0000
+
+TEN:
+0010
+
+J:
+0000
+
+N:
+0256
+
+K:
+0000
