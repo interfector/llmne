@@ -1,7 +1,7 @@
 #!/usr/local/bin/llmne -x
 # Self Modifiying Code on LXS ( XOR Encording 0x1 byte )
-# Payload size: 15 instruction
-# Adds 15 to all variable and symbols relocations
+# Payload size: 16 instruction
+# Adds 16 to all variable and symbols relocations
 
 BYTE:
 0001
@@ -35,7 +35,7 @@ INC LOOP+2
 JMP LOOP
 
 SHELLCODE:
-1018 # READ I
-3400 # CHMOD HEX
-1118 # WRITE I
 0001 # I
+1017 # READ I
+3400 # CHMOD HEX
+1117 # WRITE I
