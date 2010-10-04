@@ -1,7 +1,7 @@
 #!/usr/local/bin/llmne -x
 # dummy program
 
-ONE:
+ONIZE:
 
 INC _START
 INC ONIZE

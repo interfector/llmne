@@ -1,0 +1,15 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+NOP
+INC _START
+
+%STORE _START, 1
+
+NOP
+DEC _START
+
+%ECHO Line: $LINE, File: $IFILE, _START: $_START
+
+JMP _START

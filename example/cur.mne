@@ -1,0 +1,23 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+NOP
+
+JMP MAIN
+
+CALL $$+1
+STPOP _START
+WRITE _START
+STPUSH _START
+
+EXIT 0
+RET 0
+
+MAIN:
+
+JP 1 # one 'cause IP is incremented by loop ;)
+
+@MACRO JP , 1
+@STPUSH $$+2
+@RET 0
+@$0

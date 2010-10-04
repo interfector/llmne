@@ -1,0 +1,29 @@
+#!/usr/local/bin/llmne -x
+
+# We can use extern symbol
+
+_START:
+
+STPUSH PUSHED
+CALL READL
+
+STPUSH PUSHED+1
+CALL ATOI
+
+POP NUMBER
+
+WRITE NUMBER
+
+EXIT 0
+
+PUSHED:
+READ STRING
+PUSH STRING
+
+NUMBER:
+0000
+
+@INCLUDE stdio.mne
+
+STRING:
+0000

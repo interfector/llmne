@@ -1,0 +1,55 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+STPUSH $$+1
+PUSH STRING
+
+CALL PRINT
+
+EXIT 0
+
+# PRINT function starts
+
+PRINT:
+
+DISPLAY CHAR
+STPOP LOOP
+
+LOOP:
+
+PUSH LOOP
+CMP NULL
+JZ ENDP
+
+POP $$+4
+WRITE $$+3
+
+INC LOOP
+
+JMP LOOP
+NOP 0
+
+NULL:
+0000
+
+ENDP:
+DISPLAY INT
+RET
+
+# PRINT function ends
+
+STRING:
+0072 'H'
+0101 'e'
+0108 'l'
+0108 'l'
+0111 'o'
+0032 ' '
+0087 'W'
+0111 'o'
+0114 'r'
+0108 'l'
+0100 'd'
+0010 '\n'
+0000 '\0'

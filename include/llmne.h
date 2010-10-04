@@ -46,6 +46,12 @@ struct llmne_file {
 	int syms_len;
 };
 
+struct lxs_mne {
+	int instr, opcode;
+
+	char* mne;
+};
+
 static const struct option long_options[] =
 {
 	{"suppress", no_argument, 0, 's' },
@@ -54,11 +60,47 @@ static const struct option long_options[] =
 	{"execute", no_argument, 0, 'x' },
 	{"help", no_argument, 0, 'h'}
 };
-
+/*
+static struct lxs_mne instruction_set[] = {
+	{ 10, 1, "READ" },
+	{ 11, 1, "WRITE" },
+	{ 12, 1, "POP" },
+	{ 13, 1, "PUSH" },
+	{ 14, 1, "ADD" },
+	{ 15, 1, "SUB" },
+	{ 16, 1, "MUL" },
+	{ 17, 1, "DIV" },
+	{ 18, 1, "MOD" },
+	{ 19, 1, "AND" },
+	{ 20, 1, "OR"  },
+	{ 21, 1, "XOR" },
+	{ 22, 1, "NOT" },
+	{ 23, 1, "SHL" },
+	{ 24, 1, "SHR" },
+	{ 25, 1, "DEL" },
+	{ 26, 0, "NOP" },
+	{ 27, 1, "JMP" },
+	{ 28, 1, "CMP" },
+	{ 29, 1, "JN"  },
+	{ 30, 1, "JZ"  },
+	{ 31, 1, "JM"  },
+	{ 32, 1, "JG"  },
+	{ 33, 0, "EXIT" },
+	{ 34, 0, "DISPLAY" },
+	{ 35, 1, "INC" },
+	{ 36, 1, "DEC" },
+	{ 37, 1, "CALL" },
+	{ 38, 0, "RET" },
+	{ 39, 1, "STPUSH" },
+	{ 40, 1, "STPOP" }
+};
+*/
 FILE* o_stream;
 FILE* i_stream;
 
-#define USAGE "Usage: %s [-s] [-o <file>] [-v] [-h] input_file\n" \
+#define MAGIC "SYM\x7a"
+
+#define USAGE "Usage: %s [-s] [-c] [-o <file>] [-v] [-h] input_file\n" \
 		    "\t-s|--suppress\tDo not exit when find errors.(dangerous)\n" \
 		    "\t-o|--output\tSet the output file.\n"  \
 		    "\t-v|--version\tShow the program version.\n" \

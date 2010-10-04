@@ -1,7 +1,9 @@
 #!/usr/local/bin/llmne -x
-# Self Modifiying Code on LXS ( XOR Encording 0x1 byte )
+# Self Modifiying Code on LXS ( XOR Encoding 0x1 byte )
 # Payload size: 16 instruction
 # Adds 16 to all variable and symbols relocations
+
+@ECHO SelfModifying code ( XOR encoding ) 
 
 BYTE:
 0001

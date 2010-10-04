@@ -20,6 +20,10 @@
 #include <llmne.h>
 #include <util.h>
 
+char* trim(char*);
+void llmne_preprocess( char* );
+void llmne_parse_all( char* );
+
 void
 handle(int sig,siginfo_t *si, void* unused)
 {
@@ -76,6 +80,205 @@ banner(void)
 		"|_|_|_|_|_|_||_\\___|\n"
 		"                    \n");
 }
+
+void
+varprintf( char* buf )
+{
+	int i,j;
+	int len;
+	char* tmp;
+	extern char* i_file;
+
+	if( !buf )
+		return;
+
+	len = strlen( buf );
+
+	for(i = 0;i < len;i++)
+	{
+		if( buf[i] == '$' )
+		{
+			if ( strchr( buf + i, ' ' ) )
+				j = (strchr( buf + i, ' ')) - ( buf + i );
+			else
+				j = len - i;
+
+			tmp = malloc( j );
+			memset( tmp, 0, j );
+			memcpy( tmp, buf + i + 1, j - 1 );
+
+			if(!strcmp( tmp, "LINE" ))
+				printf("%d", nline );
+			else if (!strcmp(tmp, "IFILE"))
+				printf("%s", i_file );
+			else {
+				if(searchSymbols(tmp))
+					printf("%d", searchSymbols(tmp)->offset );
+				else
+					putchar('$');
+			}
+
+			i += strlen( tmp );
+		} else
+			putchar( buf[i] );
+	}
+}
+
+char*
+strreplace( char* start, char* nid, char* rep )
+{
+	char* replaced;
+	char* temp;
+	char* found;
+
+	found = strstr( start, nid );
+
+	if( !found )
+		return NULL;
+
+	replaced = found;
+
+	temp = strdup( found + strlen(nid) );
+
+	replaced = malloc( (found - start) + strlen(rep) + strlen(temp) + 1);
+
+	memcpy( replaced, start, (found - start) );
+	strcat( replaced, rep );
+	strcat( replaced, temp );
+
+	free( temp );
+
+	return replaced;
+}
+
+void
+parseIncludeFile( char* file )
+{
+	char* line = xmalloc(256);
+	FILE* in;
+
+	if(!(in = fopen(file, "r")))
+		die("Couldn't open include file '%s'.\n", file );
+
+//	resolveSymbols( in );
+
+	while(fgets(line, 256, in))
+	{
+		line[strlen(line)-1] = 0;
+
+		if( line[0] == 0 || line[0] == '#' )
+			continue;
+
+		if(strchr(line,'#'))
+			*((char*)strchr(line,'#')) = 0;
+
+		#ifdef _DEBUG
+			printf("%d:%s\n", nline, line);
+		#endif
+
+		if( line[0] == '%')
+		{
+			llmne_preprocess( line );
+			continue;
+		}
+
+		llmne_parse_all( line );
+	}
+
+	fclose( in );
+}
+
+struct llmne_instr*
+getMacroInstr( int nline, int *size, int arg, char** args )
+{
+	char* line = xmalloc( 256 );
+	struct llmne_instr* instr = xmalloc(sizeof(struct llmne_instr));
+	TokenCtx in;
+	int i;
+	char* tmp, *rep;
+
+	*size = 0;
+
+	tmp = xmalloc( 10 );
+	memset( tmp, 0, 10 );
+
+	while(fgets(line, 256, i_stream))
+	{
+		if(!strncmp( line, "@ENDM", 4 ))
+			break;
+
+		line[strlen(line)-1] = '\0';
+
+		if(strchr(line, '#'))
+			*((char*)strchr(line, '#')) = 0;
+/*
+		if( line[0] == '%' )
+			die("* Syntax error, couldn't use recursive macro at line %d.\n",nline);
+*/
+		line++;
+
+		for(i = 0;i < arg;i++)
+		{
+			memset( tmp, 0, strlen(tmp) );
+
+			sprintf(tmp, "$%d", i );
+
+			if(strstr(line, tmp))
+			{
+				rep = strreplace( line , tmp, args[i] );
+
+				line = strdup(rep);
+			}
+		}
+
+		TokenParse( &in, line );
+
+		instr = realloc( instr, ++*size * sizeof(struct llmne_instr));
+		instr[*size - 1] = InstrParse( &in );
+	}
+
+	return instr;
+}
+
+void
+makeMacro( char* macro, int arg )
+{
+	int i, size;
+	int old_nline = nline;
+	struct llmne_instr* instrs;
+
+	struct llmne_instr* backup;
+
+	macro = trim(macro);
+
+	for(i = 0;i < llmne.instr_len;i++)
+	{
+		if(!strcmp(llmne.instr[i].ctx.instr, macro))
+		{
+			nline = i;
+
+			if( llmne.instr[i].ctx.argc < arg )
+				die("* Syntax error, missing operand after macro at line: %d.\n",nline);
+
+			instrs = getMacroInstr( nline, &size, arg, llmne.instr[i].ctx.args );
+
+			backup = malloc( (llmne.instr_len - i) * sizeof(struct llmne_instr) );
+			memcpy( backup, &llmne.instr[i + 1], (llmne.instr_len - i - 1 ) * sizeof(struct llmne_instr) );
+
+			llmne.instr = realloc( llmne.instr, (llmne.instr_len + size) * sizeof(struct llmne_instr) );
+			memcpy( &llmne.instr[i], instrs, size * sizeof(struct llmne_instr) );
+
+			memcpy( &llmne.instr[i + size], backup, (llmne.instr_len - i - 1) * sizeof(struct llmne_instr) );
+
+			llmne.instr_len += size - 1;
+
+			free( backup );
+			free( instrs );
+		}
+	}
+
+	nline = old_nline;
+}
 			                     
 char*
 trim(char* string)
@@ -83,7 +286,7 @@ trim(char* string)
 	char* trim = malloc(strlen(string));
 	int i,k;
 
-	memset(trim,0,strlen(string));
+	memset(trim, 0, strlen(string));
 
 	for(i = 0,k = 0;i < strlen(string);i++)
 		if(string[i] != ' ' && 
@@ -91,6 +294,8 @@ trim(char* string)
  		   string[i] != '\n' &&
 		   string[i] != '\t')
 		trim[k++] = string[i];
+		
+	trim[k] = 0;
 
 	return trim;
 }
@@ -98,10 +303,12 @@ trim(char* string)
 void
 TokenParse(TokenCtx *ctx,char* line)
 {
-
 	char* token;
 
-	ctx->line = strdup(line);
+	ctx->line = strdup( line );
+
+	if( line[0] == '@' )
+		line++;
 
 	token = strtok(line, " \t");
 
@@ -118,18 +325,21 @@ TokenParse(TokenCtx *ctx,char* line)
 	
 	ctx->instr = strdup(token);
 	ctx->args = (char**) malloc(sizeof(char*));
-	ctx->argc = 1;
+	ctx->argc = 0;
 
 	while((token = strtok(NULL,",")))
 	{
-		ctx->args = (char**) realloc(ctx->args,sizeof(char*) * ctx->argc);
-		ctx->args[(ctx->argc++)-1] = strdup(token);
+		ctx->args = (char**) realloc(ctx->args,sizeof(char*) * (ctx->argc + 1));
+		ctx->args[ctx->argc++] = strdup(token);
 	}
 
-	if(ctx->line[strlen(ctx->line)-1] == ':')
-		handle_symbol(ctx->line,nline);
-	else
-		nline++;
+	if( ctx->line[0] != '@' )
+	{
+		if(ctx->line[strlen(ctx->line) - 1] == ':')
+			handle_symbol(ctx->line, nline);
+		else
+			nline++;
+	}
 }
 
 void
@@ -142,10 +352,10 @@ handle_symbol(char* line,int offset)
 
 	dup = strdup(line);
 	dup[strlen(dup)-1] = '\0';
-/*
-	if(searchSymbols(dup))
-		die("* Syntax error, duplicate symbols declaration at line %d.\n",offset);
-*/
+
+//	if(searchSymbols(dup))
+//		die("* Syntax error, duplicate symbols declaration at line %d.\n",offset);
+
 	llmne.symbols = realloc(llmne.symbols,sizeof(struct llmne_sym) * ++llmne.syms_len);
 	llmne.symbols[llmne.syms_len-1].name = strdup(dup);
 	llmne.symbols[llmne.syms_len-1].offset = offset;
@@ -153,17 +363,22 @@ handle_symbol(char* line,int offset)
 	free(dup);
 }
 
+/*
 void
-resolveSymbols(void)
+resolveSymbols( FILE* stream )
 {
 	char* line = xmalloc(256);
 	TokenCtx ctx;
 
-	while(fgets(line,256,i_stream))
+	llmne.symbols = realloc(llmne.symbols,sizeof(struct llmne_sym) * ++llmne.syms_len);
+	llmne.symbols[llmne.syms_len-1].name = strdup("$$");
+	llmne.symbols[llmne.syms_len-1].offset = 0;
+
+	while(fgets(line,256,stream))
 	{
 		line[strlen(line)-1] = '\0';
 
-		if(line[0] == '#' || line[0] == '\0')
+		if(line[0] == '#' || line[0] == '\0' || line[0] == '@')
 			continue;
 
 		TokenParse(&ctx,line);
@@ -173,7 +388,41 @@ resolveSymbols(void)
 
 	nline = 0;
 
-	fseek(i_stream,0,SEEK_SET);
+	fseek(stream,0,SEEK_SET);
+}
+*/
+
+void
+relocateAllSymbols( void )
+{
+	int i;
+	char* ptr;
+	int offset;
+	char* tmp;
+
+	for(i = 0;i < llmne.instr_len;i++)
+	{
+		offset = 0;
+
+		ptr = strtok(strdup(llmne.instr[i].ctx.line), " \t");
+		ptr = strtok(NULL, " \t");
+
+		if(!ptr)
+			continue;
+
+		if(strstr(ptr, "$$"))
+			continue;
+
+		if((tmp = strchr(ptr,'+')))
+		{
+			offset = atoi( tmp + 1 );
+
+			tmp[0] = 0;
+		}
+
+		if(searchSymbols(ptr))
+			llmne.instr[i].opcode = llmne.instr[i].instr_code * 100 + searchSymbols(ptr)->offset + offset;
+	}
 }
 
 struct llmne_sym*
@@ -229,6 +478,9 @@ InstrParse(TokenCtx* ctx)
 
 	int offset = 0;
 	char* ptr = NULL;
+
+	if(searchSymbols("$$"))
+		(searchSymbols("$$"))->offset = nline - 1;
 
 	if(!strcmp(ctx->instr,"READ")) {
 		if((ptr = strchr(ctx->args[0],'+')))
@@ -559,7 +811,51 @@ InstrParse(TokenCtx* ctx)
 			return newInstr(ctx,40,atoi(ctx->args[0]));
 	}
 
-	return (struct llmne_instr) { "VAR" ,{ "VAR", 0,0,0 },0,0, atoi(ctx->instr) };
+	ptr = strdup(ctx->instr);
+
+	int i;
+	int argc = ctx->argc;
+	char** args = malloc( argc * sizeof(char**) );
+
+	for(i = 0;i < argc;i++)
+		args[i] = trim(ctx->args[i]);
+
+	return (struct llmne_instr) { "VAR" ,{ "VAR",  ptr , args , argc }, 0, 0, atoi(ptr) };
+}
+
+void
+llmne_preprocess( char* line )
+{
+	int i;
+	TokenCtx token;
+
+	TokenParse( &token, line );
+
+	if(!strcmp(token.instr, "STORE"))
+	{
+		if( token.argc < 3 )
+			die("Error parsing STORE function at %d line.\n", nline);
+
+		if(searchSymbols(token.args[0]))
+			(searchSymbols(token.args[0]))->offset = atoi(token.args[1]);
+		else
+			die("Couldn't find the symbol \"%s\".\n", token.args[0]);
+	} else if(!strcmp(token.instr, "ECHO")) {
+		for(i = 0;i < token.argc;i++)
+			varprintf( token.args[i] );
+
+		putchar('\n');
+	} else if(!strcmp(token.instr, "MACRO")) {
+		if( token.argc < 2 )
+			die("Error parsing MACRO function at %d line.\n", nline);
+
+		makeMacro( token.args[0], atoi(token.args[1]) );
+	} else if(!strcmp(token.instr, "INCLUDE")) {
+		if( token.argc < 1 )
+			die("Error parsing INCLUDE function at %d line.\n", nline);
+
+		parseIncludeFile( token.args[0] );
+	}
 }
 
 void

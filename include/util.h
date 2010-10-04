@@ -49,9 +49,11 @@ struct llmne_instr  InstrParse(TokenCtx*);
 struct llmne_instr  newInstr(TokenCtx*,int,int);
 
 void handle_symbol(char*,int);
-void resolveSymbols(void);
+void resolveSymbols(FILE*);
+void relocateAllSymbols(void);
 
 void llmne_parse_all(char*);
+void llmne_preprocess(char*);
 void printInstr();
 void lxs_execute();
 void dump_symbols();

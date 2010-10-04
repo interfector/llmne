@@ -1,0 +1,24 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+WRITE VAR
+
+CALL FUNC
+
+EXIT 1
+
+WRITE VAR2
+EXIT 0
+
+FUNC:
+STPOP VAR2+1
+INC VAR2+1
+STPUSH VAR2+1
+RET
+
+VAR:
+1234
+
+VAR2:
+5678

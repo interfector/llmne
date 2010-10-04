@@ -21,6 +21,7 @@
 #include <util.h>
 #include <sys/stat.h>
 
+char* i_file;
 int suppress_error = 0,nline = 0;
 
 struct llmne_file llmne;
@@ -49,7 +50,7 @@ main(int argc,char **argv)
 
 	o_stream = stdout;
 	
-	while((i = getopt_long(argc, argv, "svho:x", long_options, NULL)) > 0)
+	while((i = getopt_long(argc, argv, "svhxo:", long_options, NULL)) > 0)
 	{
 		switch(i)
 		{
@@ -80,6 +81,8 @@ main(int argc,char **argv)
 	if(!(i_stream = fopen(argv[optind],"r")))
 		xdie("fopen");
 
+	i_file = argv[optind];
+
 	if(file && !(o_stream = fopen(file,"w")))
 		xdie("fopen");
 
@@ -93,9 +96,12 @@ main(int argc,char **argv)
 	}
 
 	llmne.symbols = malloc(sizeof(struct llmne_sym));
-	llmne.syms_len = 0;
+	llmne.syms_len = 1;
 
-	resolveSymbols();
+//	resolveSymbols( i_stream );
+
+	llmne.symbols[0].name = strdup("$$");
+	llmne.symbols[0].offset = 0;
 
 	line = xmalloc(256);
 	llmne.instr = xmalloc(sizeof(struct llmne_instr));
@@ -115,12 +121,22 @@ main(int argc,char **argv)
 		if(stroff(line,'#') != -1)
 			line[stroff(line,'#')] = '\0';
 
-		llmne_parse_all(line);
+		if(line[0] == '@')
+		{
+			llmne_preprocess( line );
+			continue;
+		}
+
+		llmne_parse_all( line );
 	}
 
 #ifdef _DEBUG
 	dump_symbols();
 #endif
+
+	relocateAllSymbols();
+
+	putchar('\n');
 
 	printInstr();
 
@@ -130,7 +146,9 @@ main(int argc,char **argv)
 	free(llmne.symbols);
 	free(llmne.instr);
 	free(line);
-	free(file);
+
+	if(file)
+		free(file);
 
 	if(o_stream != stdout)
 		fclose(o_stream);

@@ -1,0 +1,17 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+NOP
+
+MAIN:
+
+NOP
+
+LOL MAIN, MAIN, _START
+
+@MACRO LOL, 3
+@READ $0
+@WRITE $1
+@JMP $2
+@ENDM

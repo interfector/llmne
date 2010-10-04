@@ -1,6 +1,6 @@
 # LLMNE
 
-VERSION = 0.1.9
+VERSION = 0.3.5
 
 # includes and libs
 LIBS =

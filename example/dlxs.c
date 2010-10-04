@@ -1,6 +1,8 @@
-/* Disasassemble LXS pseudo-code to mnemonic instruction LLMNE */
+/* Disasassemble LXS pseudo-code to mnemonic instruction for LLMNE */
 #include <stdio.h>
 #include <stdlib.h>
+
+#define MAGIC "SYM\x7a"
 
 char symbol_start[] = "_START";
 
@@ -49,11 +51,16 @@ int i_size = sizeof(instruction_set) / sizeof(struct lxs_mne);
 struct lxs_mne*
 getStruct( int instr )
 {
+/*
 	int i;
 
 	for(i = 0;i < i_size;i++)
 		if( instr == instruction_set[i].instr )
 			return &instruction_set[i];
+*/
+
+	if( instr >= 10 && instr <= 40 )
+		return &instruction_set[ instr - 10 ];
 	
 	return NULL;
 }
@@ -72,6 +79,9 @@ main(int argc,char **argv)
 		return 1;
 
 	fp = fopen(argv[1],"r");
+
+	if(!fp)
+		return 1;
 
 	printf("%s:\n", symbol_start );
 

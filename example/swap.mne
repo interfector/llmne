@@ -11,6 +11,8 @@
 #	return k;
 # }
 
+READ N
+
 MAIN:
 PUSH N
 CMP NULL
