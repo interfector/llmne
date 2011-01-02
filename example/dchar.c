@@ -3,16 +3,9 @@
 #include <string.h>
 
 void
-usage(char* f)
-{
-	printf("Usage: %s <file>\n",f);
-	exit(1);
-}
-
-void
 die(char* d)
 {
-	perror(d);
+	perror( d );
 	exit(1);
 }
 
@@ -21,7 +14,7 @@ handle_char(char c)
 {
 	char* s = malloc(2);
 
-	memset(s,0,2);
+	memset(s, 0, 2);
 
 	switch(c)
 	{
@@ -48,14 +41,15 @@ main(int argc,char *argv[])
 	FILE *fp;
 	char c;
 
-	if(!argv[1])
-		usage(argv[0]);
-
-	if(!(fp = fopen(argv[1],"r")))
-		die("[ERROR] fopen");
+	if(argv[1])
+	{
+		if(!(fp = fopen(argv[1],"r")))
+			die("[ERROR] fopen");
+	} else
+		fp = stdin;
 
 	while((c = fgetc(fp)) != EOF)
-		printf("%04d \'%s\'\n",c,handle_char(c));
+		printf("%04d \'%s\'\n", c, handle_char(c));
 
 	fclose(fp);
 

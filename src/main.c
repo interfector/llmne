@@ -98,8 +98,6 @@ main(int argc,char **argv)
 	llmne.symbols = malloc(sizeof(struct llmne_sym));
 	llmne.syms_len = 1;
 
-//	resolveSymbols( i_stream );
-
 	llmne.symbols[0].name = strdup("$$");
 	llmne.symbols[0].offset = 0;
 

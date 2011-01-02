@@ -160,8 +160,6 @@ parseIncludeFile( char* file )
 	if(!(in = fopen(file, "r")))
 		die("Couldn't open include file '%s'.\n", file );
 
-//	resolveSymbols( in );
-
 	while(fgets(line, 256, in))
 	{
 		line[strlen(line)-1] = 0;
@@ -809,6 +807,10 @@ InstrParse(TokenCtx* ctx)
 			return newInstr(ctx,40,(searchSymbols(ctx->args[0]))->offset + offset);
 		else
 			return newInstr(ctx,40,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"ADDSP")) {
+		return newInstr(ctx,41,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SUBSP")) {
+		return newInstr(ctx,42,atoi(ctx->args[0]));
 	}
 
 	ptr = strdup(ctx->instr);
@@ -833,7 +835,7 @@ llmne_preprocess( char* line )
 
 	if(!strcmp(token.instr, "STORE"))
 	{
-		if( token.argc < 3 )
+		if( token.argc < 2 )
 			die("Error parsing STORE function at %d line.\n", nline);
 
 		if(searchSymbols(token.args[0]))

@@ -1,14 +1,13 @@
 #!/usr/local/bin/llmne -x
 
+VAR:
+0000
+
 _START:
 
 NOP
 
-MAIN:
-
-NOP
-
-LOL MAIN, MAIN, _START
+LOL VAR, VAR, _START
 
 @MACRO LOL, 3
 @READ $0
