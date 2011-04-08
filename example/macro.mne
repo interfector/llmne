@@ -7,9 +7,9 @@ _START:
 
 NOP
 
-LOL VAR, VAR, _START
+RAP VAR, VAR, _START
 
-@MACRO LOL, 3
+@MACRO RAP, 3 # read and print
 @READ $0
 @WRITE $1
 @JMP $2

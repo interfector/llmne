@@ -14,7 +14,7 @@ EXIT 0
 
 MAIN:
 
-JP 1 # one 'cause IP is incremented by loop ;)
+JP 2 # one 'cause IP is incremented by loop ;)
 
 @MACRO JP , 1
 @STPUSH $$+2

@@ -1,6 +1,6 @@
 # LLMNE
 
-VERSION = 0.3.5
+VERSION = 1.5.2
 
 # includes and libs
 LIBS =
@@ -19,5 +19,5 @@ clean:
 	make -C example clean 
 	rm -f $(BIN)
 
-install: all
+install:
 	cp -f $(BIN) /usr/local/bin/

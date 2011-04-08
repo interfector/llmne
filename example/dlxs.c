@@ -43,7 +43,9 @@ struct lxs_mne instruction_set[] = {
 	{ 37, 1, "CALL" },
 	{ 38, 0, "RET" },
 	{ 39, 1, "STPUSH" },
-	{ 40, 1, "STPOP" }
+	{ 40, 1, "STPOP" },
+	{ 41, 1, "ADDSP" },
+	{ 42, 1, "SUBSP" }
 };
 
 int i_size = sizeof(instruction_set) / sizeof(struct lxs_mne);
@@ -59,7 +61,7 @@ getStruct( int instr )
 			return &instruction_set[i];
 */
 
-	if( instr >= 10 && instr <= 40 )
+	if( instr >= 10 && instr <= 42 )
 		return &instruction_set[ instr - 10 ];
 	
 	return NULL;
@@ -93,7 +95,7 @@ main(int argc,char **argv)
 		instr = atoi( buf ) / 100;
 		opcode = atoi( buf ) % 100;
 
-		if(instr < 10 || instr > 40)
+		if(instr < 10 || instr > 42)
 		{
 			printf("%02d%02d # VAR\n", instr, opcode);
 
