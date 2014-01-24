@@ -1,5 +1,5 @@
 #!/usr/local/bin/llmne -x
-
+#
 _START:
 
 NOP
@@ -13,3 +13,7 @@ DEC _START
 @ECHO Line: $LINE, File: $IFILE, _START: $_START
 
 JMP _START
+
+END:
+
+NOP

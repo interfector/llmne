@@ -1,5 +1,7 @@
 2010-04-25 nex <nex@autistici.org>
 
+* util.c: fixed some bugs
+
 * util.c: includes, macros implemented
 
 * util.c: preprocessor implemented

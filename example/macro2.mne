@@ -1,0 +1,20 @@
+#!/usr/local/bin/llmne -x
+
+VAR1:
+0000
+VAR2:
+0000
+
+_START:
+
+RP VAR1, VAR1
+
+NOP 1
+NOP 1
+
+RP VAR2, VAR2
+
+@MACRO RP, 2 # read and print
+@READ $0
+@WRITE $1
+@ENDM

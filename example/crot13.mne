@@ -1,6 +1,4 @@
 #!/usr/local/bin/llmne -x
-#
-#TODO fix
 
 _START:
 
@@ -31,6 +29,7 @@ CMP NULL
 JZ ROT_END
 
 ROT_PUSH:
+
 #CMP ROT_LIMIT
 #JM ROT_NORM
 
@@ -67,7 +66,7 @@ INC ROT_LOOP
 JMP ROT_LOOP
 
 ROT_END:
-RET
+RET #0
 
 PP_GAP:
 0100
@@ -101,7 +100,7 @@ WRITE $$+3
 INC PLOOP
 
 JMP PLOOP
-NOP 0
+NOP
 
 NULL:
 0000
@@ -125,4 +124,3 @@ STRING:
 0108 'l'
 0100 'd'
 0010 '\n'
-0000

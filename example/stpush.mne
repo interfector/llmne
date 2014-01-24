@@ -1,0 +1,7 @@
+_START:
+
+STPUSH $$
+STPUSH $$
+STPUSH $$
+
+STPOP $$

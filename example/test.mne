@@ -1,0 +1,9 @@
+
+READ N
+ONESC N
+POP N
+WRITE N
+
+N:
+0000
+0000

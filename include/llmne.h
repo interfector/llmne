@@ -60,7 +60,7 @@ static const struct option long_options[] =
 	{"execute", no_argument, 0, 'x' },
 	{"help", no_argument, 0, 'h'}
 };
-/*
+
 static struct lxs_mne instruction_set[] = {
 	{ 10, 1, "READ" },
 	{ 11, 1, "WRITE" },
@@ -85,16 +85,19 @@ static struct lxs_mne instruction_set[] = {
 	{ 30, 1, "JZ"  },
 	{ 31, 1, "JM"  },
 	{ 32, 1, "JG"  },
-	{ 33, 0, "EXIT" },
+	{ 33, 1, "EXIT" },
 	{ 34, 0, "DISPLAY" },
 	{ 35, 1, "INC" },
 	{ 36, 1, "DEC" },
 	{ 37, 1, "CALL" },
 	{ 38, 0, "RET" },
 	{ 39, 1, "STPUSH" },
-	{ 40, 1, "STPOP" }
+	{ 40, 1, "STPOP" },
+	{ 41, 1, "ADDSP" },
+	{ 42, 1, "SUBSP" },
+	{ 43, 1, "ONESC" }
 };
-*/
+
 FILE* o_stream;
 FILE* i_stream;
 

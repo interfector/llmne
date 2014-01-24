@@ -8,7 +8,7 @@ int i_need[] = {
 	10,11,12,13,14,15,16,17,
 	18,19,20,21,22,23,24,25,
 	27,28,29,30,31,32,35,36,
-	37,39,40
+	37,39,40,43
 };
 
 int n_need = sizeof(i_need) / sizeof(int);
@@ -39,6 +39,16 @@ main(int arg,char *argv[])
 
 	fp = fopen(argv[1],"r");
 
+	if(argv[2])
+	{
+		i = atoi(argv[2]);
+
+		payload[3] = (i % 10) +'0';
+		payload[2] = (i /= 10) % 10 + '0';
+		payload[1] = (i /= 10) % 10 + '0';
+		payload[0] = (i /= 10) % 10 + '0';
+	}
+
 	lines = getLine( fp );
 
 	payload[13] = lines % 10 + '0';
@@ -59,14 +69,14 @@ main(int arg,char *argv[])
 		{
 			if((instr / 100) == i_need[i])
 			{
-				printf("%04d\n", (instr + 16) ^ 1);
+				printf("%04d\n", (instr + 16) ^ (argv[2] ? atoi(argv[2]) : 1));
 
 				fnd = 1;
 			}
 		}
 
 		if(!fnd)
-			printf("%04d\n", instr ^ 1);
+			printf("%04d\n", instr ^ (argv[2] ? atoi(argv[2]) : 1));
 	}
 
 	fclose(fp);

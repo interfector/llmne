@@ -1,0 +1,20 @@
+#!/usr/local/bin/llmne -x
+
+@DEFSTRUCT A
+@INT N
+@CHAR[4] STRING
+@ENDS
+
+@STRUCT A VAR2
+# VAR2:
+# 0000 (INT)
+# 0000 (CHAR[0])
+# 0000 (CHAR[1])
+# 0000 (CHAR[2])
+# 0000 (CHAR[3])
+
+READ VAR2.N 
+# READ VAR2+0
+
+READ VAR2.STRING
+# READ VAR2+1

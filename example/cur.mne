@@ -1,7 +1,6 @@
 #!/usr/local/bin/llmne -x
-
 _START:
-NOP
+2600
 
 JMP MAIN
 
@@ -14,7 +13,7 @@ EXIT 0
 
 MAIN:
 
-JP 2 # one 'cause IP is incremented by loop ;)
+JP 2 # jmp to 02
 
 @MACRO JP , 1
 @STPUSH $$+2

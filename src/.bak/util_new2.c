@@ -474,16 +474,61 @@ InstrParse(TokenCtx* ctx)
 	the multiplce action instruction and 
 	the address calculation */
 
-	int i, offset = 0;
+	int offset = 0;
 	char* ptr = NULL;
 
 	if(searchSymbols("$$"))
 		(searchSymbols("$$"))->offset = nline - 1;
 
-	int size = sizeof(instruction_set) / sizeof(struct lxs_mne);
-
-	if( !strcmp( ctx->instr, "DISPLAY" ) )
-	{
+	if(!strcmp(ctx->instr,"READ")) {
+			return newInstr(ctx,10,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"WRITE")) {
+			return newInstr(ctx,11,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"POP")) {
+			return newInstr(ctx,12,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"PUSH")) {
+			return newInstr(ctx,13,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"ADD")) {
+			return newInstr(ctx,14,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SUB")) {
+			return newInstr(ctx,15,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"MUL")) {
+			return newInstr(ctx,16,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DIV")) {
+			return newInstr(ctx,17,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"MOD")) {
+			return newInstr(ctx,18,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"AND")) {
+			return newInstr(ctx,19,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"OR")) {
+			return newInstr(ctx,20,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"XOR")) {
+			return newInstr(ctx,21,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"NOT")) {
+			return newInstr(ctx,22,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SHL")) {
+			return newInstr(ctx,23,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SHR")) {
+			return newInstr(ctx,24,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DEL")) {
+			return newInstr(ctx,25,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"NOP")) {
+		return newInstr(ctx,26,26);
+	} else if (!strcmp(ctx->instr,"JMP")) {
+			return newInstr(ctx,27,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"CMP")) {
+			return newInstr(ctx,28,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JN")) {
+			return newInstr(ctx,29,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JZ")) {
+			return newInstr(ctx,30,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JM")) {
+			return newInstr(ctx,31,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JG")) {
+			return newInstr(ctx,32,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"EXIT")) {
+			return newInstr(ctx,33,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DISPLAY")) {
 		if(!strcmp(ctx->args[0],"INT"))
 			offset = 0;
 		else if(!strcmp(ctx->args[0],"HEX"))
@@ -497,32 +542,28 @@ InstrParse(TokenCtx* ctx)
 		else
 			offset = 0;
 
-		return newInstr(ctx, 34, offset);
-	}
-
-	for(i = 0;i < size;i++)
-	{
-		if( !strcmp( ctx->instr, instruction_set[i].mne ) )
-		{
-			if( instruction_set[i].opcode )
-			{
-				if((ptr = strchr(ctx->args[0],'+')))
-				{
-					offset = atoi( ptr + 1);
-					ptr[0] = '\0';
-				}
-
-				if(searchSymbols(ctx->args[0]))
-					return newInstr(ctx, instruction_set[i].instr, (searchSymbols(ctx->args[0]))->offset + offset);
-				else
-					return newInstr(ctx, instruction_set[i].instr , atoi(ctx->args[0]));
-			} else
-				return newInstr(ctx, instruction_set[i].instr , instruction_set[i].instr);
-		}
+		return newInstr(ctx,34,offset);
+	} else if (!strcmp(ctx->instr,"INC")) {
+			return newInstr(ctx,35,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DEC")) {
+			return newInstr(ctx,36,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"CALL")) {
+			return newInstr(ctx,37,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"RET")) {
+		return newInstr(ctx,38,00);
+	} else if (!strcmp(ctx->instr,"STPUSH")) {
+			return newInstr(ctx,39,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"STPOP")) {
+			return newInstr(ctx,40,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"ADDSP")) {
+		return newInstr(ctx,41,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SUBSP")) {
+		return newInstr(ctx,42,atoi(ctx->args[0]));
 	}
 
 	ptr = strdup(ctx->instr);
 
+	int i;
 	int argc = ctx->argc;
 	char** args = malloc( argc * sizeof(char**) );
 
@@ -546,12 +587,8 @@ llmne_preprocess( char* line )
 			die("Error parsing STORE function at %d line.\n", nline);
 
 		if(searchSymbols(token.args[0]))
-		{
-			if(searchSymbols(token.args[1]))
-				(searchSymbols(token.args[0]))->offset = searchSymbols(token.args[1])->offset;
-			else
-				(searchSymbols(token.args[0]))->offset = atoi(token.args[1]);
-		} else
+			(searchSymbols(token.args[0]))->offset = atoi(token.args[1]);
+		else
 			die("Couldn't find the symbol \"%s\".\n", token.args[0]);
 	} else if(!strcmp(token.instr, "ECHO")) {
 		for(i = 0;i < token.argc;i++)

@@ -1,0 +1,25 @@
+#!/usr/local/bin/llmne -x
+
+_START:
+
+FOR 1, 5, FUNC
+
+EXIT 0
+
+FUNC:
+STPOP $$+1
+0000
+WRITE $$-1
+RET 0
+
+@MACRO FOR, 3 # read and print
+@$0
+@$1
+@ENDM
+#@PUSH $$-2
+#@CMP	$$-2
+#@JZ	$$+5
+#@STPUSH $$-5 
+#@CALL $2
+#@INC	$$-7
+#@JMP	$$-6

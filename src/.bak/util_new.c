@@ -474,16 +474,268 @@ InstrParse(TokenCtx* ctx)
 	the multiplce action instruction and 
 	the address calculation */
 
-	int i, offset = 0;
+	int offset = 0;
 	char* ptr = NULL;
 
 	if(searchSymbols("$$"))
 		(searchSymbols("$$"))->offset = nline - 1;
 
-	int size = sizeof(instruction_set) / sizeof(struct lxs_mne);
+	if(!strcmp(ctx->instr,"READ")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
 
-	if( !strcmp( ctx->instr, "DISPLAY" ) )
-	{
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,10,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,10,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"WRITE")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,11,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,11,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"POP")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,12,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,12,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"PUSH")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,13,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,13,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"ADD")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,14,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,14,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SUB")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,15,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,15,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"MUL")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,16,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,16,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DIV")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,17,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,17,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"MOD")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,18,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,18,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"AND")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,19,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,19,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"OR")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,20,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,20,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"XOR")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,21,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,21,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"NOT")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,22,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,22,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SHL")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,23,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,23,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SHR")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,24,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,24,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DEL")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,25,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,25,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"NOP")) {
+		return newInstr(ctx,26,26);
+	} else if (!strcmp(ctx->instr,"JMP")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,27,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,27,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"CMP")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,28,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,28,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JN")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,29,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,29,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JZ")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,30,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,30,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JM")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,31,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,31,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"JG")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,32,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,32,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"EXIT")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,33,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,33,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DISPLAY")) {
 		if(!strcmp(ctx->args[0],"INT"))
 			offset = 0;
 		else if(!strcmp(ctx->args[0],"HEX"))
@@ -497,32 +749,73 @@ InstrParse(TokenCtx* ctx)
 		else
 			offset = 0;
 
-		return newInstr(ctx, 34, offset);
-	}
-
-	for(i = 0;i < size;i++)
-	{
-		if( !strcmp( ctx->instr, instruction_set[i].mne ) )
+		return newInstr(ctx,34,offset);
+	} else if (!strcmp(ctx->instr,"INC")) {
+		if((ptr = strchr(ctx->args[0],'+')))
 		{
-			if( instruction_set[i].opcode )
-			{
-				if((ptr = strchr(ctx->args[0],'+')))
-				{
-					offset = atoi( ptr + 1);
-					ptr[0] = '\0';
-				}
-
-				if(searchSymbols(ctx->args[0]))
-					return newInstr(ctx, instruction_set[i].instr, (searchSymbols(ctx->args[0]))->offset + offset);
-				else
-					return newInstr(ctx, instruction_set[i].instr , atoi(ctx->args[0]));
-			} else
-				return newInstr(ctx, instruction_set[i].instr , instruction_set[i].instr);
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
 		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,35,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,35,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"DEC")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,36,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,36,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"CALL")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,37,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,37,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"RET")) {
+		return newInstr(ctx,38,00);
+	} else if (!strcmp(ctx->instr,"STPUSH")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,39,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,39,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"STPOP")) {
+		if((ptr = strchr(ctx->args[0],'+')))
+		{
+			offset = atoi(ptr+1);
+			ptr[0] = '\0';
+		}
+
+		if(searchSymbols(ctx->args[0]))
+			return newInstr(ctx,40,(searchSymbols(ctx->args[0]))->offset + offset);
+		else
+			return newInstr(ctx,40,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"ADDSP")) {
+		return newInstr(ctx,41,atoi(ctx->args[0]));
+	} else if (!strcmp(ctx->instr,"SUBSP")) {
+		return newInstr(ctx,42,atoi(ctx->args[0]));
 	}
 
 	ptr = strdup(ctx->instr);
 
+	int i;
 	int argc = ctx->argc;
 	char** args = malloc( argc * sizeof(char**) );
 

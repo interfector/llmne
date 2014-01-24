@@ -1,0 +1,12 @@
+_START:
+
+PUSHN 1
+
+NOP
+
+PUSHN 2
+
+@MACRO PUSHN, 1
+@$0
+@PUSH $$-1
+@ENDM
