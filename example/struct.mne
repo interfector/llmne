@@ -1,8 +1,10 @@
 #!/usr/local/bin/llmne -x
 
 @DEFSTRUCT A
-@INT N
-@CHAR[4] STRING
+INT N
+CHAR STRING
+CHAR
+CHAR
 @ENDS
 
 @STRUCT A VAR2

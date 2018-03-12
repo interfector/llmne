@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 
 char* i_file;
-int suppress_error = 0,nline = 0;
+int suppress_error = 0, nline = 0;
 
 struct llmne_file llmne;
 
@@ -45,12 +45,13 @@ main(int argc,char **argv)
 	char* file = NULL;
 	char* line = NULL;
 	int   execute = 0;
+	int   symbol_debug = 0;
 
 	init_signal();
 
 	o_stream = stdout;
 	
-	while((i = getopt_long(argc, argv, "svhxo:", long_options, NULL)) > 0)
+	while((i = getopt_long(argc, argv, "sgvhxo:", long_options, NULL)) > 0)
 	{
 		switch(i)
 		{
@@ -64,6 +65,9 @@ main(int argc,char **argv)
 				break;
 			case 'x':
 				execute = 1;
+				break;
+			case 'g':
+				symbol_debug = 1;
 				break;
 			case '?':
 			case 'h':
@@ -134,7 +138,16 @@ main(int argc,char **argv)
 
 	relocateAllSymbols();
 
-	putchar('\n');
+	if(o_stream == stdout )
+		putchar('\n');
+
+	if( symbol_debug )
+	{
+		int j;
+
+		for(j = 1;j < llmne.syms_len;j++)
+			printf("#SYM:%02d|%s\n", llmne.symbols[j].offset, llmne.symbols[j].name);
+	}
 
 	printInstr();
 

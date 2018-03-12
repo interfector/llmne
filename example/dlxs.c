@@ -1,6 +1,8 @@
 /* Disasassemble LXS pseudo-code to mnemonic instruction for LLMNE */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
+#include <memory.h>
 
 #define MAGIC "SYM\x7a"
 
@@ -12,11 +14,16 @@ struct lxs_mne {
 	char* mne;
 };
 
+struct llmne_sym {
+	char* name;
+	int pointer;
+};
+
 struct lxs_mne instruction_set[] = {
 	{ 10, 1, "READ" },
 	{ 11, 1, "WRITE" },
-	{ 12, 1, "POP" },
-	{ 13, 1, "PUSH" },
+	{ 12, 1, "SAVE" },
+	{ 13, 1, "LOAD" },
 	{ 14, 1, "ADD" },
 	{ 15, 1, "SUB" },
 	{ 16, 1, "MUL" },
@@ -36,7 +43,7 @@ struct lxs_mne instruction_set[] = {
 	{ 30, 1, "JZ"  },
 	{ 31, 1, "JM"  },
 	{ 32, 1, "JG"  },
-	{ 33, 0, "EXIT" },
+	{ 33, 1, "EXIT" },
 	{ 34, 0, "DISPLAY" },
 	{ 35, 1, "INC" },
 	{ 36, 1, "DEC" },
@@ -45,25 +52,78 @@ struct lxs_mne instruction_set[] = {
 	{ 39, 1, "STPUSH" },
 	{ 40, 1, "STPOP" },
 	{ 41, 1, "ADDSP" },
-	{ 42, 1, "SUBSP" }
+	{ 42, 1, "SUBSP" },
+	{ 43, 1, "ONESC" },
+	{ 44, 1, "INT3" },
+	{ 45, 1, "PUSHA" },
+	{ 46, 1, "POPA" },
+	{ 47, 1, "DEFSYNTAX" }
+
 };
 
-int i_size = sizeof(instruction_set) / sizeof(struct lxs_mne);
+#define MAX_CALL 47
+#define MAX_SYNTAX 10
+
+char* syntaxCommand[MAX_SYNTAX];
+int   syntax_counter = 0;
+
+int maxCall = MAX_CALL;
 
 struct lxs_mne*
 getStruct( int instr )
 {
-/*
-	int i;
-
-	for(i = 0;i < i_size;i++)
-		if( instr == instruction_set[i].instr )
-			return &instruction_set[i];
-*/
-
-	if( instr >= 10 && instr <= 42 )
+	if( instr >= 10 && instr <= MAX_CALL )
 		return &instruction_set[ instr - 10 ];
 	
+	return NULL;
+}
+
+struct llmne_sym*
+parseSymbolTable( FILE* fp, int* n )
+{
+	char buf[BUFSIZ];
+	int dim = 10;
+
+	struct llmne_sym* syms = malloc(sizeof(struct llmne_sym) * dim);
+
+	while(fgets(buf,BUFSIZ,fp))
+	{
+		if(strncmp(buf, "#SYM:",5))
+			continue;
+
+		if(*n == dim)
+		{
+			struct llmne_sym* tmp = malloc(sizeof(struct llmne_sym) * dim * 2);
+
+			memcpy( tmp, syms, sizeof(struct llmne_sym) * dim );
+
+			free( syms );
+
+			syms = tmp;
+			dim *= 2;
+		}
+
+		syms[*n].pointer = atoi(buf+5);
+		syms[*n].name = strdup(strchr(buf,'|')+1);
+		syms[*n].name[strlen(syms[*n].name)-1] = '\0';
+
+		*n = *n + 1;
+	}
+
+	rewind( fp );
+
+	return syms;
+}
+
+char*
+searchSymbol( struct llmne_sym* symbols, int size, int offset )
+{
+	int i;
+
+	for(i = 0;i < size;i++)
+		if( symbols[i].pointer == offset )
+			return symbols[i].name;
+
 	return NULL;
 }
 
@@ -72,10 +132,12 @@ main(int argc,char **argv)
 {
 	FILE *fp;
 	char buf[BUFSIZ];
+	char* ptr_name;
 
-	int instr, opcode;
+	int instr, opcode, rcode, nsymbol, current_ptr = 0;
 
 	struct lxs_mne* get;
+	struct llmne_sym* symbols;
 
 	if(!argv[1])
 		return 1;
@@ -85,6 +147,8 @@ main(int argc,char **argv)
 	if(!fp)
 		return 1;
 
+	symbols = parseSymbolTable( fp, &nsymbol );
+
 	printf("%s:\n", symbol_start );
 
 	while(fgets(buf,BUFSIZ,fp))
@@ -92,12 +156,21 @@ main(int argc,char **argv)
 		if( buf[0] == '#' || buf[0] == '\n' || buf[0] == '\0')
 			continue;
 
-		instr = atoi( buf ) / 100;
-		opcode = atoi( buf ) % 100;
+		if( (ptr_name = searchSymbol( symbols, nsymbol, current_ptr )) )
+			printf("%s:\n", ptr_name );
 
-		if(instr < 10 || instr > 42)
+		rcode = atoi( buf );
+		instr = rcode / 100;
+		opcode = rcode % 100;
+
+		if(instr < 10 || instr > maxCall)
 		{
-			printf("%02d%02d # VAR\n", instr, opcode);
+			if( 33 <= rcode && rcode <= 127 )
+				printf("%02d%02d # VAR ( '%c' )\n", instr, opcode, rcode);
+			else
+				printf("%02d%02d # VAR\n", instr, opcode);
+
+			current_ptr++;
 
 			continue;
 		}
@@ -125,6 +198,22 @@ main(int argc,char **argv)
 					break;
 			}
 
+			current_ptr++;
+
+			continue;
+		} else if ( instr == 45 ) {
+			printf("DEFSYNTAX FOO%d, %02d\n", syntax_counter, opcode);
+
+			syntaxCommand[syntax_counter] = malloc(sizeof(char)*10);
+			sprintf(syntaxCommand[syntax_counter], "FOO%d", syntax_counter );
+
+			syntax_counter++;
+			maxCall++;
+
+			continue;
+		} else if (instr > MAX_CALL ) {
+			printf("%s %d\n", syntaxCommand[instr-MAX_CALL-1], opcode );
+
 			continue;
 		}
 
@@ -139,9 +228,17 @@ main(int argc,char **argv)
 		printf("%s ", get->mne );
 
 		if(get->opcode)
-			printf( "%s+%d\n", symbol_start, opcode);
-		else
-			printf("%d\n", opcode);
+		{
+			if( (ptr_name = searchSymbol( symbols, nsymbol, opcode )) )
+				printf( "%s\n", ptr_name);
+			else if ( abs(opcode-current_ptr) <= 3 )
+				printf( "$$%c%d\n", (opcode - current_ptr >= 0) ? '+' : '-', abs(opcode - current_ptr) );
+			else
+				printf( "%s+%d\n", symbol_start, opcode);
+		} else
+			putchar('\n');
+
+		current_ptr++;
 	}
 
 	fclose( fp );

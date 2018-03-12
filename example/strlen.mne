@@ -3,7 +3,7 @@
 
 LOOP:
 # Loop until *STR == '\0'
-PUSH STR
+LOAD STR
 CMP NULL
 JZ LOOP+6
 INC LOOP

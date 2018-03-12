@@ -12,20 +12,20 @@ die(char* d)
 char*
 handle_char(char c)
 {
-	char* s = malloc(2);
+	char* s = malloc(3);
 
-	memset(s, 0, 2);
+	memset(s, 0, 3);
 
 	switch(c)
 	{
 		case '\n':
-			strcpy(s,"\\n");
+			strncpy(s,"\\n", 2);
 			break;
 		case '\t':
-			strcpy(s,"\\t");
+			strncpy(s,"\\t", 2);
 			break;
 		case '\r':
-			strcpy(s,"\\r");
+			strncpy(s,"\\r", 2);
 			break;
 		default:
 			s[0] = c;

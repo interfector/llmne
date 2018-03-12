@@ -1,0 +1,22 @@
+TEST:
+
+LOAD ARG
+
+PUSHA
+
+LOAD ARG1
+
+INT3 1
+
+POPA
+
+INT3 2
+
+ARG:
+0000
+
+ARG1:
+0001
+
+$$:
+123

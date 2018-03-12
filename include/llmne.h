@@ -64,8 +64,8 @@ static const struct option long_options[] =
 static struct lxs_mne instruction_set[] = {
 	{ 10, 1, "READ" },
 	{ 11, 1, "WRITE" },
-	{ 12, 1, "POP" },
-	{ 13, 1, "PUSH" },
+	{ 12, 1, "SAVE" },
+	{ 13, 1, "LOAD" },
 	{ 14, 1, "ADD" },
 	{ 15, 1, "SUB" },
 	{ 16, 1, "MUL" },
@@ -95,8 +95,22 @@ static struct lxs_mne instruction_set[] = {
 	{ 40, 1, "STPOP" },
 	{ 41, 1, "ADDSP" },
 	{ 42, 1, "SUBSP" },
-	{ 43, 1, "ONESC" }
+	{ 43, 1, "ONESC" },
+	{ 44, 1, "INT3" },
+	{ 45, 0, "PUSHA" },
+	{ 46, 0, "POPA" },
+	{ 47, 1, "DEFSYNTAX" }
 };
+
+#define MAX_CALL 47
+
+struct defSyntax_fz {
+	char* name;
+	int  opcode;
+};
+
+static int syntax_counter = 0;
+static struct defSyntax_fz syntaxCommand[10];
 
 FILE* o_stream;
 FILE* i_stream;

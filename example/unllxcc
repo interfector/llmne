@@ -1,0 +1,3 @@
+#!/bin/bash
+
+objdump -d $1 | grep 68 -A 1 | grep e8 -B 1 | grep 68 | grep push | awk {'print $8'} | sed 's/$0x//ig' | /home/nex/bin/dec2hex

@@ -1,7 +1,6 @@
-
 READ N
 ONESC N
-POP N
+SAVE N
 WRITE N
 
 N:

@@ -1,0 +1,10 @@
+_START:
+
+$FETCH END
+
+NOP
+NOP
+NOP
+
+END:
+$FETCH END

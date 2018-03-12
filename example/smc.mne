@@ -3,8 +3,6 @@
 # Payload size: 16 instruction
 # Adds 16 to all variable and symbols relocations
 
-@ECHO SelfModifying code ( XOR encoding ) 
-
 BYTE:
 0001
 
@@ -16,18 +14,18 @@ LEN:
 
 _START:
 
-PUSH LOOP
+LOAD LOOP
 DEC LEN
 ADD LEN
-POP END
+SAVE END
 
 LOOP:
 
-PUSH SHELLCODE
+LOAD SHELLCODE
 XOR BYTE
-POP SHELLCODE
+SAVE SHELLCODE
 
-PUSH LOOP
+LOAD LOOP
 CMP END
 JZ SHELLCODE
 

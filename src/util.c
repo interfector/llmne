@@ -277,7 +277,7 @@ makeMacro( char* macro, int arg )
 
 	nline = old_nline;
 }
-			                     
+			
 char*
 trim(char* string)
 {
@@ -498,6 +498,23 @@ InstrParse(TokenCtx* ctx)
 			offset = 0;
 
 		return newInstr(ctx, 34, offset);
+	} else if( !strcmp( ctx->instr, "DEFSYNTAX" ) ) {
+		if( ctx->argc < 2 )
+			die("Error parsing DEFSYNTAX function at %d line.\n", nline);
+
+		syntaxCommand[syntax_counter].name = strdup(ctx->args[0]);
+		syntaxCommand[syntax_counter].opcode = syntax_counter+MAX_CALL+1;
+
+		syntax_counter++;
+
+		return newInstr(ctx, MAX_CALL /* opcode for DEFSYNTAX ALWAYS */, atoi(ctx->args[1]));
+	} else if( !strcmp( ctx->instr, "$FETCH" ) ) {
+		struct llmne_sym* sym;
+
+		if( ctx->argc < 1 )
+			die("Error parsing FETCH function at %d line.\n", nline);
+
+		return newInstr(ctx, 0, 0);
 	}
 
 	for(i = 0;i < size;i++)
@@ -519,6 +536,12 @@ InstrParse(TokenCtx* ctx)
 			} else
 				return newInstr(ctx, instruction_set[i].instr , instruction_set[i].instr);
 		}
+	}
+
+	for(i = 0;i < syntax_counter;i++)
+	{
+		if( !strcmp( ctx->instr, syntaxCommand[i].name ) )
+			return newInstr(ctx, syntaxCommand[i].opcode, atoi(ctx->args[0]));
 	}
 
 	ptr = strdup(ctx->instr);
@@ -577,7 +600,7 @@ printInstr()
 	int i;
 	
 	for(i = 0;i < llmne.instr_len;i++)
-		printf("%04d  %s\n",llmne.instr[i].opcode,
+		printf("%04d  # %s\n",llmne.instr[i].opcode,
 					   llmne.instr[i].ctx.line);
 }
 
@@ -591,7 +614,7 @@ lxs_execute()
 		xdie("tmpfile");
 
 	for(i = 0;i < llmne.instr_len;i++)
-		fprintf(fp,"%04d  %s\n",llmne.instr[i].opcode,
+		fprintf(fp,"%04d  # %s\n",llmne.instr[i].opcode,
 				llmne.instr[i].ctx.line);
 
 	fclose(fp);
